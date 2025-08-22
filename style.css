@@ -1,0 +1,108 @@
+/* --- เบื้องต้น --- */
+body {
+  font-family: sans-serif;
+  margin: 0;
+  background: #fff8f0;
+  color: #333;
+}
+
+/* --- Header --- */
+header {
+  background: #d4a373;
+  color: white;
+  padding: 10px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap; /* รองรับมือถือ */
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+}
+
+.logo {
+  width: 50px;   /* ปรับขนาดโลโก้ได้ */
+  height: auto;
+  margin-right: 10px;
+}
+
+nav a {
+  margin: 0 10px;
+  color: white;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+nav a:hover {
+  text-decoration: underline;
+}
+
+/* --- Hero Section --- */
+.hero {
+  text-align: center;
+  padding: 50px 20px;
+  background: #f5ebe0;
+}
+
+/* --- Products / เมนูสินค้า --- */
+.products {
+  padding: 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
+}
+
+.product {
+  background: white;
+  padding: 15px;
+  border-radius: 10px;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+  text-align: center;
+}
+
+.product img {
+  width: 100%;
+  border-radius: 10px;
+}
+
+/* --- ปุ่ม --- */
+button {
+  background: #d4a373;
+  border: none;
+  padding: 10px 15px;
+  color: white;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+button:hover {
+  background: #a47148;
+}
+
+/* --- ตะกร้าสินค้า --- */
+.cart, .contact {
+  padding: 20px;
+}
+
+#cart-items p {
+  margin: 10px 0;
+}
+
+/* --- Responsive เบื้องต้น --- */
+@media (max-width: 600px) {
+  header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  nav {
+    margin-top: 10px;
+  }
+
+  .products {
+    grid-template-columns: 1fr; /* แสดงสินค้าเป็น 1 คอลัมน์บนมือถือ */
+  }
+}

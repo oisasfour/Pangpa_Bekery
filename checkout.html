@@ -1,0 +1,81 @@
+﻿<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <title>Checkout - Pangpa_Bekery</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>Checkout</h1>
+    <a href="index.html">← กลับไปเลือกสินค้า</a>
+  </header>
+
+  <section class="checkout">
+    <h2>กรอกข้อมูลการสั่งซื้อ</h2>
+    <form id="checkout-form">
+      <label>ชื่อ-นามสกุล:</label>
+      <input type="text" id="name" required>
+
+      <label>เบอร์โทร:</label>
+      <input type="tel" id="phone" required>
+
+      <label>ที่อยู่จัดส่ง:</label>
+      <textarea id="address" required></textarea>
+
+      <label>วิธีชำระเงิน:</label>
+      <select id="payment">
+        <option value="โอนเงิน">โอนเงิน</option>
+        <option value="เก็บเงินปลายทาง">เก็บเงินปลายทาง</option>
+      </select>
+
+      <button type="submit">ยืนยันสั่งซื้อ</button>
+    </form>
+  </section>
+
+  <script>
+  document.getElementById("checkout-form").addEventListener("submit", function(e){
+    e.preventDefault();
+
+    let orderData = {
+      name: document.getElementById("name").value,
+      phone: document.getElementById("phone").value,
+      address: document.getElementById("address").value,
+      payment: document.getElementById("payment").value,
+      cart: JSON.parse(localStorage.getItem("cart")) || []
+    };
+
+    if(orderData.cart.length === 0){
+      alert("ตะกร้าว่าง กรุณาเลือกสินค้าก่อน");
+      window.location.href = "index.html";
+      return;
+    }
+
+    // ===== LINE Notify =====
+    let token = "ใส่โทเคนที่ได้จาก LINE Notify ตรงนี้"; 
+    let message = 
+      "📢 ออเดอร์ใหม่จาก Pangpa_Bekery\n" +
+      "👤 ลูกค้า: " + orderData.name + "\n" +
+      "📞 เบอร์: " + orderData.phone + "\n" +
+      "🏠 ที่อยู่: " + orderData.address + "\n" +
+      "💳 ชำระเงิน: " + orderData.payment + "\n" +
+      "🛒 รายการ: " + orderData.cart.map(item => item.name + " x" + item.qty).join(", ");
+
+    fetch("https://notify-api.line.me/api/notify", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+        "Authorization": "Bearer " + token
+      },
+      body: "message=" + encodeURIComponent(message)
+    })
+    .then(res => res.text())
+    .then(() => {
+      alert("สั่งซื้อสำเร็จ! ร้านได้รับออเดอร์แล้ว");
+      localStorage.removeItem("cart");
+      window.location.href = "index.html";
+    });
+  });
+  </script>
+</body>
+</html>

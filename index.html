@@ -1,0 +1,67 @@
+﻿<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <title>Pangpa_Bekery</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <div class="header-left">
+      <img src="img/LOGO PP Bekery.png" alt="Logo ร้านขนมปัง" class="logo">
+      <h1>Pangpa_Bekery</h1>
+    </div>
+    <nav>
+      <a href="#menu">Menu</a>
+      <a href="#cart">Cart</a>
+      <a href="#contact">Contact</a>
+    </nav>
+  </header>
+
+  <section class="hero">
+    <h2>อบใหม่ทุกวัน หอมกรุ่นจากเตา</h2>
+    <p>ขนมปังโฮมเมด สดใหม่ รสชาติเหมือนทำจากใจ</p>
+  </section>
+
+  <!-- เมนูสินค้า -->
+  <section id="menu" class="products">
+    <h2>Menu</h2>
+    <div class="product" data-id="1" data-name="Croissant" data-price="35">
+      <img src="img/bread1.jpg" alt="Croissant">
+      <h3>Croissant</h3>
+      <p>Price 35 baht</p>
+      <button onclick="addToCart(this)">Add</button>
+    </div>
+    <div class="product" data-id="2" data-name="Donat" data-price="35">
+      <img src="img/bread2.png" alt="Donat">
+      <h3>Donat</h3>
+      <p>Price 35 baht</p>
+      <button onclick="addToCart(this)">Add</button>
+    </div>
+    <div class="product" data-id="3" data-name="Egg Tart" data-price="35">
+      <img src="img/bread3.jpg" alt="Egg Tart">
+      <h3>Egg Tart</h3>
+      <p>Price 35 baht</p>
+      <button onclick="addToCart(this)">Add</button>
+    </div>
+  </section>
+
+  <!-- ตะกร้าสินค้า -->
+  <section id="cart" class="cart">
+    <h2>Cart</h2>
+    <div id="cart-items"></div>
+    <p id="cart-total">Price: 0 Baht</p>
+    <button onclick="checkout()">สั่งซื้อ</button>
+  </section>
+
+  <!-- ติดต่อร้าน -->
+  <section id="contact" class="contact">
+    <h2>ติดต่อร้าน</h2>
+    <p>📍 8/9 คลองสี่ คลองหลวง ปทุมธานี 12120</p>
+    <p>📞 081-234-5678</p>
+    <p>IG: @Pangpa_Bakery</p>
+  </section>
+
+  <script src="script.js"></script>
+</body>
+</html>
