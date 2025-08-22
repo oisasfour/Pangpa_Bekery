@@ -24,58 +24,89 @@
       <textarea id="address" required></textarea>
 
       <label>วิธีชำระเงิน:</label>
-      <select id="payment">
-        <option value="โอนเงิน">โอนเงิน</option>
-        <option value="เก็บเงินปลายทาง">เก็บเงินปลายทาง</option>
+      <select id="payment" onchange="showPaymentInfo()" required>
+        <option value="">-- เลือกวิธีชำระเงิน --</option>
+        <option value="True Wallet">True Wallet</option>
+        <option value="QR Prompt Pay">QR Prompt Pay</option>
       </select>
 
-      <button type="submit">ยืนยันสั่งซื้อ</button>
+      <div id="payment-info" style="margin-top:10px;"></div>
+
+      <button type="submit" style="margin-top:20px;">ยืนยันสั่งซื้อ</button>
     </form>
   </section>
 
   <script>
-  document.getElementById("checkout-form").addEventListener("submit", function(e){
-    e.preventDefault();
+    // แสดง QR และช่องอัปโหลดสลิปตามวิธีชำระเงิน
+    function showPaymentInfo(){
+      let method = document.getElementById("payment").value;
+      let info = document.getElementById("payment-info");
 
-    let orderData = {
-      name: document.getElementById("name").value,
-      phone: document.getElementById("phone").value,
-      address: document.getElementById("address").value,
-      payment: document.getElementById("payment").value,
-      cart: JSON.parse(localStorage.getItem("cart")) || []
-    };
-
-    if(orderData.cart.length === 0){
-      alert("ตะกร้าว่าง กรุณาเลือกสินค้าก่อน");
-      window.location.href = "index.html";
-      return;
+      if(method === "True Wallet"){
+        info.innerHTML = `
+          <p>โอนเงินผ่าน True Wallet:</p>
+          <img src="img/qr-truewallet.png" alt="QR True Wallet" style="width:200px;"><br>
+          <p>กรุณาอัปโหลดสลิปโอนเงิน:</p>
+          <input type="file" id="slip-file" accept="image/*">
+        `;
+      } else if(method === "QR Prompt Pay"){
+        info.innerHTML = `
+          <p>โอนเงินผ่าน PromptPay:</p>
+          <img src="img/qr-promptpay.png" alt="QR PromptPay" style="width:200px;"><br>
+          <p>กรุณาอัปโหลดสลิปโอนเงิน:</p>
+          <input type="file" id="slip-file" accept="image/*">
+        `;
+      } else {
+        info.innerHTML = ""; // เก็บเงินปลายทางไม่ต้องอัปโหลดสลิป
+      }
     }
 
-    // ===== LINE Notify =====
-    let token = "ใส่โทเคนที่ได้จาก LINE Notify ตรงนี้"; 
-    let message = 
-      "📢 ออเดอร์ใหม่จาก Pangpa_Bekery\n" +
-      "👤 ลูกค้า: " + orderData.name + "\n" +
-      "📞 เบอร์: " + orderData.phone + "\n" +
-      "🏠 ที่อยู่: " + orderData.address + "\n" +
-      "💳 ชำระเงิน: " + orderData.payment + "\n" +
-      "🛒 รายการ: " + orderData.cart.map(item => item.name + " x" + item.qty).join(", ");
+    // ฟังก์ชันดึงข้อมูลสลิปเป็น Base64
+    function getSlipBase64(){
+      let fileInput = document.getElementById("slip-file");
+      if(fileInput && fileInput.files.length > 0){
+        let file = fileInput.files[0];
+        return new Promise((resolve) => {
+          let reader = new FileReader();
+          reader.onload = function(){ resolve(reader.result.split(",")[1]); }
+          reader.readAsDataURL(file);
+        });
+      } else {
+        return Promise.resolve(null);
+      }
+    }
 
-    fetch("https://notify-api.line.me/api/notify", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-        "Authorization": "Bearer " + token
-      },
-      body: "message=" + encodeURIComponent(message)
-    })
-    .then(res => res.text())
-    .then(() => {
-      alert("สั่งซื้อสำเร็จ! ร้านได้รับออเดอร์แล้ว");
+    // ยืนยันสั่งซื้อ
+    document.getElementById("checkout-form").addEventListener("submit", async function(e){
+      e.preventDefault();
+
+      let cart = JSON.parse(localStorage.getItem("cart")) || [];
+      if(cart.length === 0){
+        alert("ตะกร้าว่าง กรุณาเลือกสินค้าก่อน");
+        window.location.href = "index.html";
+        return;
+      }
+
+      let slipBase64 = await getSlipBase64();
+
+      let orderData = {
+        name: document.getElementById("name").value,
+        phone: document.getElementById("phone").value,
+        address: document.getElementById("address").value,
+        payment: document.getElementById("payment").value,
+        cart: cart,
+        slip: slipBase64 // ถ้าไม่มีสลิป จะเป็น null
+      };
+
+      // บันทึก order ไว้ localStorage เพื่อใช้ใน waiting.html
+      localStorage.setItem("latestOrder", JSON.stringify(orderData));
+
+      // ล้างตะกร้า
       localStorage.removeItem("cart");
-      window.location.href = "index.html";
+
+      // เด้งไปหน้า waiting.html
+      window.location.href = "waiting.html";
     });
-  });
   </script>
 </body>
 </html>

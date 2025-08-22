@@ -16,7 +16,7 @@ function addToCart(btn) {
   }
 
   saveCart();
-  updateCart(); // ✅ เพิ่มบรรทัดนี้
+  updateCart();
   alert(name + " ถูกเพิ่มลงตะกร้าแล้ว");
 }
 
@@ -61,6 +61,38 @@ function checkout(){
   window.location.href = "checkout.html";
 }
 
+// ตรวจสอบสลิปด้วย Tesseract (สำหรับ checkout.html)
+function submitSlip(){
+  let slipFile = document.getElementById("slip-file").files[0];
+  if(!slipFile){
+    alert("กรุณาเลือกไฟล์สลิปก่อน");
+    return;
+  }
+
+  let totalAmount = cart.reduce((sum,item)=>sum + item.price*item.qty, 0);
+  let status = document.getElementById("ocr-status");
+  status.innerText = "กำลังตรวจสอบสลิป...";
+
+  Tesseract.recognize(
+    slipFile,
+    'eng',
+    { logger: m => console.log(m) }
+  ).then(({ data: { text } }) => {
+    console.log("OCR Text:", text);
+    let numbers = text.match(/\d+/g);
+    let slipAmount = numbers ? Math.max(...numbers.map(Number)) : 0;
+
+    if(slipAmount >= totalAmount){
+      alert("ตรวจสอบสลิปเรียบร้อย ✅ จำนวนเงินตรงกับออเดอร์");
+      // ส่งข้อมูลไปร้านหรือบันทึกออเดอร์
+      localStorage.removeItem("cart");
+      window.location.href = "waiting.html"; // เด้งไปหน้า รอการตรวจสอบ
+    } else {
+      alert("จำนวนเงินในสลิปไม่ตรง ❌ กรุณาตรวจสอบและอัปโหลดใหม่");
+      status.innerText = "จำนวนเงินไม่ตรงกับออเดอร์";
+    }
+  });
+}
 
 // เรียกแสดงตะกร้าเมื่อเปิดหน้า
 updateCart();

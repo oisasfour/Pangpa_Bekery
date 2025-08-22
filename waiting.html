@@ -1,0 +1,58 @@
+﻿<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <title>รอการตรวจสอบ - Pangpa_Bekery</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>รอการตรวจสอบออเดอร์</h1>
+    <a href="index.html">← กลับไปหน้าแรก</a>
+  </header>
+
+  <section class="checkout">
+    <h2>ออเดอร์ล่าสุดของคุณ</h2>
+    <div id="order-info"></div>
+
+    <div style="margin-top:20px;">
+      <button id="confirm-order" style="background:#4CAF50;">ยืนยันออเดอร์ (สำหรับเจ้าของร้าน)</button>
+    </div>
+  </section>
+
+  <script>
+    // ดึงข้อมูล order ล่าสุด
+    let latestOrder = JSON.parse(localStorage.getItem("latestOrder"));
+
+    let orderInfoDiv = document.getElementById("order-info");
+
+    if(!latestOrder){
+      orderInfoDiv.innerHTML = "<p>ไม่พบออเดอร์ล่าสุด</p>";
+    } else {
+      let total = latestOrder.cart.reduce((sum,item) => sum + item.price*item.qty, 0);
+      let cartHTML = latestOrder.cart.map(item => `<li>${item.name} x ${item.qty} = ${item.price*item.qty} บาท</li>`).join("");
+      
+      orderInfoDiv.innerHTML = `
+        <p><strong>ชื่อ:</strong> ${latestOrder.name}</p>
+        <p><strong>เบอร์โทร:</strong> ${latestOrder.phone}</p>
+        <p><strong>ที่อยู่:</strong> ${latestOrder.address}</p>
+        <p><strong>วิธีชำระเงิน:</strong> ${latestOrder.payment}</p>
+        <p><strong>รายการสินค้า:</strong></p>
+        <ul>${cartHTML}</ul>
+        <p><strong>รวมทั้งหมด:</strong> ${total} บาท</p>
+        ${latestOrder.slip ? `<p><strong>สลิปโอนเงิน:</strong><br><img src="data:image/png;base64,${latestOrder.slip}" style="max-width:300px;"></p>` : ''}
+        <p style="color:red;"><strong>รอการตรวจสอบสลิป...</strong></p>
+      `;
+    }
+
+    // ปุ่มยืนยันออเดอร์ (สำหรับเจ้าของร้าน)
+    document.getElementById("confirm-order").addEventListener("click", function(){
+      if(confirm("ยืนยันรับออเดอร์นี้?")){
+        alert("คุณได้ยืนยันรับออเดอร์เรียบร้อยแล้ว");
+        localStorage.removeItem("latestOrder");
+        window.location.href = "index.html";
+      }
+    });
+  </script>
+</body>
+</html>
